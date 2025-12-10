@@ -1,0 +1,1 @@
+{"root":["./app.tsx","./index.tsx","./types.ts","./utils.ts","./vite.config.ts","./components/analysispanel.tsx","./components/authmodal.tsx","./components/exportmodal.tsx","./components/palettelibrarymodal.tsx","./components/visualizer.tsx","./services/geminiservice.ts","./services/supabaseclient.ts","./src/stack.ts"],"version":"5.9.3"}

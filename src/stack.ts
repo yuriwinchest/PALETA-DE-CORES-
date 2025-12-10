@@ -1,7 +1,7 @@
-import { Stack } from "@stackframe/react";
+import { StackClientApp } from "@stackframe/react";
 
-export const stack = new Stack({
+export const stack = new StackClientApp({
     projectId: import.meta.env.VITE_STACK_PROJECT_ID || process.env.NEXT_PUBLIC_STACK_PROJECT_ID || "",
-    apiKey: import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY || process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY || "",
-    tokenStore: "localStorage",
+    publishableClientKey: import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY || process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY || "",
+    tokenStore: "cookie",
 });
