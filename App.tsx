@@ -130,7 +130,7 @@ export default function App() {
             <Palette size={20} className="text-white" />
           </div>
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-            ChromaFlow
+            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.0</span>
           </h1>
         </div>
 
