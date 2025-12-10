@@ -13,15 +13,21 @@
     "@google/genai": "*",
     "@neondatabase/serverless": "^1.0.2",
     "@stackframe/react": "^2.8.56",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.400.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.10.1",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.5.3",
     "vite": "^5.3.4"
   },
