@@ -6,6 +6,8 @@ import { stack } from "./src/stack";
 import { BrowserRouter } from 'react-router-dom';
 import './src/index.css';
 
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
@@ -16,7 +18,9 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <StackProvider app={stack}>
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </StackProvider>
     </BrowserRouter>
   </React.StrictMode>
