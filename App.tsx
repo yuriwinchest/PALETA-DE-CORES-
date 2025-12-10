@@ -11,6 +11,7 @@ import Visualizer from './components/Visualizer';
 import AnalysisPanel from './components/AnalysisPanel';
 import ExportModal from './components/ExportModal';
 import PaletteLibraryModal from './components/PaletteLibraryModal';
+import AuthModal from './components/AuthModal';
 import { useStackApp, useUser } from "@stackframe/react";
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from './services/geminiService';
 
@@ -70,7 +71,7 @@ export default function App() {
 
   const handleSavePalette = async () => {
     if (!user) {
-      stackApp.signIn();
+      window.location.href = stackApp.urls.signIn;
       return;
     }
 
@@ -299,7 +300,7 @@ export default function App() {
             </div>
           ) : (
             <button
-              onClick={() => stackApp.signIn()}
+              onClick={() => window.location.href = stackApp.urls.signIn}
               className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition border border-slate-700"
             >
               <UserCircle size={18} /> Entrar
@@ -337,7 +338,7 @@ export default function App() {
               <button
                 onClick={() => {
                   if (!user) {
-                    stackApp.signIn();
+                    window.location.href = stackApp.urls.signIn;
                   } else {
                     setShowLibrary(true);
                   }
