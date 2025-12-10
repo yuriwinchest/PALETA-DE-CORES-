@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Palette, Plus, Trash2, LayoutTemplate, 
+  Palette as PaletteIcon, Plus, Trash2, LayoutTemplate, 
   BrainCircuit, Download, RefreshCw, Wand2, 
-  SlidersHorizontal, Sparkles
+  SlidersHorizontal, Sparkles, Save, FolderOpen, FilePlus
 } from 'lucide-react';
-import { ColorDef, ViewMode, AIAnalysisResult } from './types';
+import { ColorDef, ViewMode, AIAnalysisResult, Palette } from './types';
 import { generateId, getContrastTextColor } from './utils';
 import Visualizer from './components/Visualizer';
 import AnalysisPanel from './components/AnalysisPanel';
 import ExportModal from './components/ExportModal';
+import PaletteLibraryModal from './components/PaletteLibraryModal';
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from './services/geminiService';
 
 const DEFAULT_COLORS: ColorDef[] = [
@@ -28,6 +29,76 @@ export default function App() {
   const [prompt, setPrompt] = useState('');
   const [showExport, setShowExport] = useState(false);
   const [loadingColorIds, setLoadingColorIds] = useState<Set<string>>(new Set());
+
+  // Palette Management State
+  const [savedPalettes, setSavedPalettes] = useState<Palette[]>([]);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [paletteName, setPaletteName] = useState("Minha Paleta");
+  const [currentPaletteId, setCurrentPaletteId] = useState<string | null>(null);
+
+  // Load palettes from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('chromaflow_palettes');
+    if (saved) {
+      try {
+        setSavedPalettes(JSON.parse(saved));
+      } catch (e) {
+        console.error("Erro ao carregar paletas", e);
+      }
+    }
+  }, []);
+
+  const saveToLocalStorage = (palettes: Palette[]) => {
+    localStorage.setItem('chromaflow_palettes', JSON.stringify(palettes));
+  };
+
+  const handleSavePalette = () => {
+    const idToUse = currentPaletteId || generateId();
+    const newPalette: Palette = {
+      id: idToUse,
+      name: paletteName,
+      colors: colors,
+      description: analysis?.overallVibe || `Criada em ${new Date().toLocaleDateString('pt-BR')}`
+    };
+
+    const updated = [...savedPalettes];
+    const index = updated.findIndex(p => p.id === idToUse);
+    if (index >= 0) {
+      updated[index] = newPalette;
+    } else {
+      updated.push(newPalette);
+    }
+
+    setSavedPalettes(updated);
+    saveToLocalStorage(updated);
+    setCurrentPaletteId(idToUse);
+    // Could add toast notification here
+  };
+
+  const handleLoadPalette = (palette: Palette) => {
+    setColors(palette.colors);
+    setPaletteName(palette.name);
+    setCurrentPaletteId(palette.id);
+    setAnalysis(null);
+    setShowLibrary(false);
+  };
+
+  const handleDeletePalette = (id: string) => {
+    const updated = savedPalettes.filter(p => p.id !== id);
+    setSavedPalettes(updated);
+    saveToLocalStorage(updated);
+    if (currentPaletteId === id) {
+      setCurrentPaletteId(null);
+    }
+  };
+
+  const handleNewPalette = () => {
+    setColors(DEFAULT_COLORS.map(c => ({...c, id: generateId()}))); // Clone defaults with new IDs
+    setPaletteName("Nova Paleta");
+    setCurrentPaletteId(null);
+    setAnalysis(null);
+    setPrompt('');
+  };
 
   // Helper to update a color property
   const updateColor = (id: string, updates: Partial<ColorDef>) => {
@@ -82,7 +153,9 @@ export default function App() {
         name: c.name
       }));
       setColors(newColors);
-      setAnalysis(null); // Clear old analysis
+      setPaletteName(result.name || prompt);
+      setCurrentPaletteId(null); // Reset ID as this is a new generation
+      setAnalysis(null);
       setPrompt('');
     } catch (err) {
         alert("Falha ao gerar paleta.");
@@ -109,7 +182,6 @@ export default function App() {
     }
   };
 
-  // Drag and Drop placeholder (simplified for this context by using array order)
   const moveColor = (index: number, direction: 'up' | 'down') => {
     const newColors = [...colors];
     if (direction === 'up' && index > 0) {
@@ -127,10 +199,10 @@ export default function App() {
       <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-10 shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <Palette size={20} className="text-white" />
+            <PaletteIcon size={20} className="text-white" />
           </div>
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.1</span>
+            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.2</span>
           </h1>
         </div>
 
@@ -170,9 +242,46 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 flex overflow-hidden">
         
-        {/* Left Sidebar: Palette Builder (Always visible in Editor, hidden in others on small screens) */}
+        {/* Left Sidebar: Palette Builder */}
         <aside className={`w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 transition-all duration-300 ${viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex'}`}>
           
+          {/* Palette Management Section */}
+          <div className="p-6 pb-4 border-b border-slate-800 space-y-3">
+             <div className="flex items-center gap-2 mb-1">
+                <input 
+                  type="text" 
+                  value={paletteName}
+                  onChange={(e) => setPaletteName(e.target.value)}
+                  className="bg-transparent text-lg font-bold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-500 hover:border-slate-700 transition"
+                  placeholder="Nome do Projeto"
+                />
+             </div>
+             
+             <div className="flex gap-2">
+                <button 
+                  onClick={handleNewPalette}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-slate-700"
+                  title="Novo Projeto"
+                >
+                  <FilePlus size={14} /> Novo
+                </button>
+                <button 
+                  onClick={() => setShowLibrary(true)}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-slate-700"
+                  title="Abrir Projeto"
+                >
+                  <FolderOpen size={14} /> Abrir
+                </button>
+                <button 
+                  onClick={handleSavePalette}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 shadow-lg shadow-indigo-500/20"
+                  title="Salvar Projeto"
+                >
+                  <Save size={14} /> Salvar
+                </button>
+             </div>
+          </div>
+
           {/* AI Generator Input */}
           <div className="p-6 border-b border-slate-800">
              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block flex items-center gap-1">
@@ -183,7 +292,7 @@ export default function App() {
                   type="text" 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="ex: 'Pôr do sol em Tóquio' ou 'Café Cyberpunk'"
+                  placeholder="ex: 'Pôr do sol em Tóquio'"
                   className="w-full bg-slate-800 text-sm text-white placeholder-slate-500 rounded-lg px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                />
                <button 
@@ -199,7 +308,7 @@ export default function App() {
           {/* Color List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             <div className="flex justify-between items-center mb-2">
-               <h3 className="text-sm font-bold text-slate-300">Paleta Ativa</h3>
+               <h3 className="text-sm font-bold text-slate-300">Cores</h3>
                <span className="text-xs text-slate-500">{colors.length} cores</span>
             </div>
             
@@ -314,6 +423,14 @@ export default function App() {
       </main>
 
       <ExportModal colors={colors} isOpen={showExport} onClose={() => setShowExport(false)} />
+      
+      <PaletteLibraryModal 
+        isOpen={showLibrary}
+        onClose={() => setShowLibrary(false)}
+        palettes={savedPalettes}
+        onLoad={handleLoadPalette}
+        onDelete={handleDeletePalette}
+      />
     </div>
   );
 }
