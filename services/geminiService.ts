@@ -1,17 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ColorDef, AIAnalysisResult } from '../types';
 
-const getAiClient = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API Key not found");
-  }
-  return new GoogleGenAI({ apiKey });
-};
-
 export const analyzePaletteWithGemini = async (colors: ColorDef[]): Promise<AIAnalysisResult> => {
   try {
-    const ai = getAiClient();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const modelId = "gemini-2.5-flash"; // Fast and capable for this task
 
     const colorList = colors.map(c => c.hex).join(', ');
@@ -53,7 +45,7 @@ export const analyzePaletteWithGemini = async (colors: ColorDef[]): Promise<AIAn
 
 export const generatePaletteFromPrompt = async (prompt: string): Promise<{ name: string; colors: { hex: string; name: string }[] }> => {
   try {
-    const ai = getAiClient();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const modelId = "gemini-2.5-flash";
 
     const response = await ai.models.generateContent({
@@ -90,7 +82,7 @@ export const generatePaletteFromPrompt = async (prompt: string): Promise<{ name:
 
 export const getColorFromDescription = async (description: string): Promise<string> => {
   try {
-    const ai = getAiClient();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const modelId = "gemini-2.5-flash";
 
     const response = await ai.models.generateContent({
