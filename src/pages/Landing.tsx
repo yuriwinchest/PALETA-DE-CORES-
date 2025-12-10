@@ -44,7 +44,7 @@ export default function Landing() {
             </motion.header>
 
             {/* Hero Section */}
-            <main className="flex-1 flex items-center justify-center relative overflow-hidden px-6 py-20 md:py-32">
+            <main className="flex-1 flex items-center relative overflow-hidden px-6 py-20 md:py-32">
                 {/* Background Gradients */}
                 <motion.div
                     animate={{
@@ -72,58 +72,83 @@ export default function Landing() {
                     className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-purple-600/20 blur-[100px] rounded-full pointer-events-none -z-10 mix-blend-screen"
                 />
 
-                <div className="max-w-5xl mx-auto text-center relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-8 backdrop-blur-sm"
-                    >
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                        </span>
-                        Novo: Geração de Paletas com IA
-                    </motion.div>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-5xl md:text-7xl font-bold leading-tight tracking-tight mb-8"
-                    >
-                        A paleta perfeita para o seu <br />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 animate-gradient">próximo projeto.</span>
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed"
-                    >
-                        Gere, visualize e exporte paletas de cores incríveis em segundos.
-                        Use o poder da inteligência artificial para encontrar a harmonia ideal.
-                    </motion.p>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-                    >
-                        <Link
-                            to={user ? "/app" : "/sign-in"}
-                            className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold text-lg hover:bg-indigo-50 transition shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 hover:-translate-y-1 transform flex items-center gap-2"
+                <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center relative z-10">
+                    {/* Left: Text Content */}
+                    <div className="text-left">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-8 backdrop-blur-sm"
                         >
-                            Começar Agora <ArrowRight size={20} />
-                        </Link>
-                        <a
-                            href="#features"
-                            className="px-8 py-4 bg-white/5 text-slate-300 rounded-xl font-semibold text-lg hover:bg-white/10 hover:text-white transition border border-white/10 backdrop-blur"
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                            </span>
+                            Novo: Geração de Paletas com IA
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-5xl md:text-7xl font-bold leading-tight tracking-tight mb-8"
                         >
-                            Saber mais
-                        </a>
+                            A paleta perfeita para o seu{" "}
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">próximo projeto.</span>
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed"
+                        >
+                            Gere, visualize e exporte paletas de cores incríveis em segundos.
+                            Use o poder da inteligência artificial para encontrar a harmonia ideal.
+                        </motion.p>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="flex flex-col sm:flex-row gap-4"
+                        >
+                            <Link
+                                to={user ? "/app" : "/sign-in"}
+                                className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold text-lg hover:bg-indigo-50 transition shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 hover:-translate-y-1 transform flex items-center gap-2 justify-center"
+                            >
+                                Começar Agora <ArrowRight size={20} />
+                            </Link>
+                            <a
+                                href="#features"
+                                className="px-8 py-4 bg-white/5 text-slate-300 rounded-xl font-semibold text-lg hover:bg-white/10 hover:text-white transition border border-white/10 backdrop-blur text-center"
+                            >
+                                Saber mais
+                            </a>
+                        </motion.div>
+                    </div>
+
+                    {/* Right: Hero Image */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4, duration: 0.8 }}
+                        className="hidden md:block"
+                    >
+                        <motion.img
+                            src="/assets/images/landing-hero-3d.png"
+                            alt="Abstract 3D Color Prisms"
+                            animate={{
+                                y: [0, -20, 0],
+                            }}
+                            transition={{
+                                duration: 6,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                            className="w-full h-auto rounded-2xl shadow-2xl"
+                        />
                     </motion.div>
                 </div>
             </main>
