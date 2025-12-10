@@ -10,7 +10,9 @@ export default defineConfig(function (_a) {
         plugins: [react()],
         define: {
             // Injects the environment variables into the client-side code at build time
-            'process.env.API_KEY': JSON.stringify(env.API_KEY)
+            'process.env.API_KEY': JSON.stringify(env.API_KEY),
+            'process.env.NEXT_PUBLIC_STACK_PROJECT_ID': JSON.stringify(env.NEXT_PUBLIC_STACK_PROJECT_ID),
+            'process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY': JSON.stringify(env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY)
         }
     };
 });
