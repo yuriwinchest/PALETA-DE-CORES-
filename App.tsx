@@ -11,7 +11,6 @@ import Visualizer from './components/Visualizer';
 import AnalysisPanel from './components/AnalysisPanel';
 import ExportModal from './components/ExportModal';
 import PaletteLibraryModal from './components/PaletteLibraryModal';
-import AuthModal from './components/AuthModal';
 import { useStackApp, useUser } from "@stackframe/react";
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from './services/geminiService';
 
@@ -506,11 +505,6 @@ export default function App() {
         palettes={savedPalettes}
         onLoad={handleLoadPalette}
         onDelete={handleDeletePalette}
-      />
-
-      <AuthModal
-        isOpen={false} // Deprecated
-        onClose={() => { }}
       />
     </div>
   );
