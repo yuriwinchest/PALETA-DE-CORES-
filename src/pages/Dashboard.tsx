@@ -6,13 +6,14 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStackApp, useUser } from "@stackframe/react";
-import { ColorDef, ViewMode, AIAnalysisResult, Palette } from '../../types';
-import { generateId } from '../../utils';
-import Visualizer from '../../components/Visualizer';
-import AnalysisPanel from '../../components/AnalysisPanel';
-import ExportModal from '../../components/ExportModal';
-import PaletteLibraryModal from '../../components/PaletteLibraryModal';
-import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from '../../services/geminiService';
+import { motion, AnimatePresence } from "framer-motion";
+import { ColorDef, ViewMode, AIAnalysisResult, Palette } from '../types';
+import { generateId } from '../utils';
+import Visualizer from '../components/Visualizer';
+import AnalysisPanel from '../components/AnalysisPanel';
+import ExportModal from '../components/ExportModal';
+import PaletteLibraryModal from '../components/PaletteLibraryModal';
+import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from '../services/geminiService';
 
 const DEFAULT_COLORS: ColorDef[] = [
     { id: '1', hex: '#2563EB', name: 'Azul Real' },
@@ -139,7 +140,7 @@ export default function Dashboard() {
 
     const handleLogout = async () => {
         await user?.signOut();
-        navigate('/sign-in');
+        navigate('/');
     };
 
     const handleNewPalette = () => {
@@ -245,11 +246,16 @@ export default function Dashboard() {
         <div className="flex flex-col h-screen bg-slate-950 text-slate-100 overflow-hidden">
 
             {/* Header */}
-            <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-10 shrink-0">
+            <header className="h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0 sticky top-0 shadow-sm">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <motion.div
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20"
+                    >
                         <PaletteIcon size={20} className="text-white" />
-                    </div>
+                    </motion.div>
                     <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
                         ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.3</span>
                     </h1>
@@ -257,24 +263,33 @@ export default function Dashboard() {
 
                 <div className="flex items-center gap-4">
                     {/* View Switcher */}
-                    <div className="bg-slate-800 p-1 rounded-lg flex gap-1 border border-slate-700 hidden sm:flex">
+                    <div className="bg-slate-800/50 p-1 rounded-lg flex gap-1 border border-white/10 hidden sm:flex backdrop-blur-sm">
                         <button
                             onClick={() => setViewMode(ViewMode.EDITOR)}
-                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.EDITOR ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.EDITOR ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
-                            <SlidersHorizontal size={16} /> <span className="hidden lg:inline">Editor</span>
+                            {viewMode === ViewMode.EDITOR && (
+                                <motion.div layoutId="tab-bg" className="absolute inset-0 bg-indigo-600 rounded shadow-sm" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                            )}
+                            <span className="relative z-10 flex items-center gap-2"><SlidersHorizontal size={16} /> <span className="hidden lg:inline">Editor</span></span>
                         </button>
                         <button
                             onClick={() => setViewMode(ViewMode.VISUALIZER)}
-                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.VISUALIZER ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.VISUALIZER ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
-                            <LayoutTemplate size={16} /> <span className="hidden lg:inline">Visualizar</span>
+                            {viewMode === ViewMode.VISUALIZER && (
+                                <motion.div layoutId="tab-bg" className="absolute inset-0 bg-indigo-600 rounded shadow-sm" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                            )}
+                            <span className="relative z-10 flex items-center gap-2"><LayoutTemplate size={16} /> <span className="hidden lg:inline">Visualizar</span></span>
                         </button>
                         <button
                             onClick={() => setViewMode(ViewMode.ANALYSIS)}
-                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.ANALYSIS ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.ANALYSIS ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
-                            <BrainCircuit size={16} /> <span className="hidden lg:inline">Análise</span>
+                            {viewMode === ViewMode.ANALYSIS && (
+                                <motion.div layoutId="tab-bg" className="absolute inset-0 bg-indigo-600 rounded shadow-sm" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                            )}
+                            <span className="relative z-10 flex items-center gap-2"><BrainCircuit size={16} /> <span className="hidden lg:inline">Análise</span></span>
                         </button>
                     </div>
 
@@ -314,10 +329,10 @@ export default function Dashboard() {
             <main className="flex-1 flex overflow-hidden">
 
                 {/* Left Sidebar: Palette Builder */}
-                <aside className={`w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 transition-all duration-300 ${viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex'}`}>
+                <aside className={`w-full md:w-80 lg:w-96 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 ${viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex'}`}>
 
                     {/* Palette Management Section */}
-                    <div className="p-6 pb-4 border-b border-slate-800 space-y-3">
+                    <div className="p-6 pb-4 border-b border-white/5 space-y-3">
                         <div className="flex items-center gap-2 mb-1">
                             <input
                                 type="text"
@@ -360,7 +375,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* AI Generator Input */}
-                    <div className="p-6 border-b border-slate-800">
+                    <div className="p-6 border-b border-white/5">
                         <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block flex items-center gap-1">
                             <Wand2 size={12} /> Gerador com IA
                         </label>
@@ -370,7 +385,7 @@ export default function Dashboard() {
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder="ex: 'Pôr do sol em Tóquio'"
-                                className="w-full bg-slate-800 text-sm text-white placeholder-slate-500 rounded-lg px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                                className="w-full bg-slate-800/50 text-sm text-white placeholder-slate-500 rounded-lg px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                             />
                             <button
                                 type="submit"
@@ -389,77 +404,86 @@ export default function Dashboard() {
                             <span className="text-xs text-slate-500">{colors.length} cores</span>
                         </div>
 
-                        {colors.map((color, index) => (
-                            <div key={color.id} className="group bg-slate-800 rounded-xl p-3 border border-slate-700 hover:border-indigo-500/50 transition-all shadow-sm flex items-center gap-3 relative">
-
-                                {/* Drag Handle */}
-                                <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity cursor-grab">
-                                    <button onClick={() => moveColor(index, 'up')} className="hover:text-white"><div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-current"></div></button>
-                                    <button onClick={() => moveColor(index, 'down')} className="hover:text-white"><div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-current"></div></button>
-                                </div>
-
-                                {/* Color Input */}
-                                <div className="relative w-12 h-12 rounded-lg shadow-inner overflow-hidden shrink-0 border border-slate-600">
-                                    <input
-                                        type="color"
-                                        value={color.hex}
-                                        onChange={(e) => updateColor(color.id, { hex: e.target.value })}
-                                        className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer p-0 border-0"
-                                    />
-                                </div>
-
-                                <div className="flex-1 min-w-0 flex flex-col gap-1">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={color.name}
-                                            onChange={(e) => updateColor(color.id, { name: e.target.value })}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    handleMagicColorLookup(color.id, color.name);
-                                                }
-                                            }}
-                                            className="bg-transparent text-sm font-semibold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-500 pr-6"
-                                            placeholder="ex: 'Azul Céu'"
-                                        />
-                                        <button
-                                            onClick={() => handleMagicColorLookup(color.id, color.name)}
-                                            className={`absolute right-0 top-0 text-indigo-400 hover:text-indigo-300 transition ${!color.name ? 'opacity-0' : 'opacity-100'}`}
-                                            title="Busca de Cor IA (Digite o nome e clique)"
-                                            disabled={loadingColorIds.has(color.id)}
-                                        >
-                                            {loadingColorIds.has(color.id) ? (
-                                                <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-                                            ) : (
-                                                <Sparkles size={12} />
-                                            )}
-                                        </button>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-mono text-slate-400 uppercase">{color.hex}</span>
-                                        </div>
-                                        {color.psychology && (
-                                            <div className="flex items-center gap-1 text-[10px] text-indigo-400/80">
-                                                <BrainCircuit size={10} />
-                                                <span className="truncate max-w-[180px]" title={color.psychology}>{color.psychology}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={() => removeColor(color.id)}
-                                    className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-red-400 transition"
+                        <AnimatePresence>
+                            {colors.map((color, index) => (
+                                <motion.div
+                                    key={color.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    className="group bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 hover:border-indigo-500/50 transition-all shadow-sm flex items-center gap-3 relative hover:bg-slate-800"
                                 >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ))}
+
+                                    {/* Drag Handle */}
+                                    <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity cursor-grab">
+                                        <button onClick={() => moveColor(index, 'up')} className="hover:text-white"><div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-current"></div></button>
+                                        <button onClick={() => moveColor(index, 'down')} className="hover:text-white"><div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-current"></div></button>
+                                    </div>
+
+                                    {/* Color Input */}
+                                    <div className="relative w-12 h-12 rounded-lg shadow-inner overflow-hidden shrink-0 border border-slate-600/50 group-hover:scale-105 transition-transform">
+                                        <input
+                                            type="color"
+                                            value={color.hex}
+                                            onChange={(e) => updateColor(color.id, { hex: e.target.value })}
+                                            className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer p-0 border-0"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={color.name}
+                                                onChange={(e) => updateColor(color.id, { name: e.target.value })}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleMagicColorLookup(color.id, color.name);
+                                                    }
+                                                }}
+                                                className="bg-transparent text-sm font-semibold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-500 pr-6"
+                                                placeholder="ex: 'Azul Céu'"
+                                            />
+                                            <button
+                                                onClick={() => handleMagicColorLookup(color.id, color.name)}
+                                                className={`absolute right-0 top-0 text-indigo-400 hover:text-indigo-300 transition ${!color.name ? 'opacity-0' : 'opacity-100'}`}
+                                                title="Busca de Cor IA (Digite o nome e clique)"
+                                                disabled={loadingColorIds.has(color.id)}
+                                            >
+                                                {loadingColorIds.has(color.id) ? (
+                                                    <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                                                ) : (
+                                                    <Sparkles size={12} />
+                                                )}
+                                            </button>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs font-mono text-slate-400 uppercase">{color.hex}</span>
+                                            </div>
+                                            {color.psychology && (
+                                                <div className="flex items-center gap-1 text-[10px] text-indigo-400/80">
+                                                    <BrainCircuit size={10} />
+                                                    <span className="truncate max-w-[180px]" title={color.psychology}>{color.psychology}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => removeColor(color.id)}
+                                        className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-red-400 transition"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
                         <button
                             onClick={addColor}
-                            className="w-full py-3 rounded-xl border-2 border-dashed border-slate-700 text-slate-500 hover:border-indigo-500 hover:text-indigo-400 transition flex items-center justify-center gap-2 font-medium"
+                            className="w-full py-3 rounded-xl border-2 border-dashed border-slate-700/50 text-slate-500 hover:border-indigo-500 hover:text-indigo-400 transition flex items-center justify-center gap-2 font-medium hover:bg-slate-800/30"
                         >
                             <Plus size={18} /> Adicionar Cor
                         </button>
@@ -467,35 +491,62 @@ export default function Dashboard() {
                 </aside>
 
                 {/* Right Content Area */}
-                <section className="flex-1 bg-slate-950 relative overflow-hidden">
-                    {viewMode === ViewMode.EDITOR && (
-                        <div className="h-full flex items-center justify-center text-slate-500 p-8 text-center">
-                            <div className="max-w-md">
-                                <LayoutTemplate size={64} className="mx-auto mb-6 opacity-20" />
-                                <h2 className="text-2xl font-bold text-slate-300 mb-2">Pronto para Criar</h2>
-                                <p className="mb-8">Use a barra lateral para definir suas cores. Mude para "Visualizar" para vê-las em ação ou "Análise" para insights da IA.</p>
-                                <button
-                                    onClick={() => setViewMode(ViewMode.VISUALIZER)}
-                                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition"
-                                >
-                                    Abrir Visualização
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                <section className="flex-1 bg-slate-950 relative overflow-hidden flex flex-col">
+                    <AnimatePresence mode="wait">
+                        {viewMode === ViewMode.EDITOR && (
+                            <motion.div
+                                key="editor"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.05 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full flex items-center justify-center text-slate-500 p-8 text-center"
+                            >
+                                <div className="max-w-md">
+                                    <LayoutTemplate size={64} className="mx-auto mb-6 opacity-20" />
+                                    <h2 className="text-2xl font-bold text-slate-300 mb-2">Pronto para Criar</h2>
+                                    <p className="mb-8">Use a barra lateral para definir suas cores. Mude para "Visualizar" para vê-las em ação ou "Análise" para insights da IA.</p>
+                                    <button
+                                        onClick={() => setViewMode(ViewMode.VISUALIZER)}
+                                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition shadow-lg shadow-indigo-500/25"
+                                    >
+                                        Abrir Visualização
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
 
-                    {viewMode === ViewMode.VISUALIZER && (
-                        <Visualizer colors={colors} />
-                    )}
+                        {viewMode === ViewMode.VISUALIZER && (
+                            <motion.div
+                                key="visualizer"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <Visualizer colors={colors} />
+                            </motion.div>
+                        )}
 
-                    {viewMode === ViewMode.ANALYSIS && (
-                        <AnalysisPanel
-                            colors={colors}
-                            analysis={analysis}
-                            isLoading={isAnalyzing}
-                            onAnalyze={handleAnalyze}
-                        />
-                    )}
+                        {viewMode === ViewMode.ANALYSIS && (
+                            <motion.div
+                                key="analysis"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <AnalysisPanel
+                                    colors={colors}
+                                    analysis={analysis}
+                                    isLoading={isAnalyzing}
+                                    onAnalyze={handleAnalyze}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </section>
             </main>
 
