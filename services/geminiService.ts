@@ -10,21 +10,21 @@ export const analyzePaletteWithGemini = async (colors: ColorDef[]): Promise<AIAn
 
     const response = await ai.models.generateContent({
       model: modelId,
-      contents: `Analyze this color palette: ${colorList}. Provide the overall psychological vibe, and for each color, its specific psychological meaning and a recommended UI usage (e.g., 'CTA Button', 'Background', 'Text').`,
+      contents: `Analise esta paleta de cores: ${colorList}. Forneça a vibe psicológica geral e, para cada cor, seu significado psicológico específico e um uso recomendado na UI (ex: 'Botão de Ação', 'Fundo', 'Texto'). RESPONDA EM PORTUGUÊS DO BRASIL.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            overallVibe: { type: Type.STRING, description: "A summary of the palette's mood" },
+            overallVibe: { type: Type.STRING, description: "Resumo do clima da paleta em Português" },
             colorAnalysis: {
               type: Type.ARRAY,
               items: {
                 type: Type.OBJECT,
                 properties: {
                   hex: { type: Type.STRING },
-                  psychology: { type: Type.STRING, description: "Psychological impact of this specific color" },
-                  recommendedUsage: { type: Type.STRING, description: "Best UI element to apply this color to" }
+                  psychology: { type: Type.STRING, description: "Impacto psicológico desta cor específica em Português" },
+                  recommendedUsage: { type: Type.STRING, description: "Melhor elemento de UI para aplicar esta cor em Português" }
                 }
               }
             }
@@ -34,7 +34,7 @@ export const analyzePaletteWithGemini = async (colors: ColorDef[]): Promise<AIAn
     });
 
     const text = response.text;
-    if (!text) throw new Error("No response from AI");
+    if (!text) throw new Error("Sem resposta da IA");
     return JSON.parse(text) as AIAnalysisResult;
 
   } catch (error) {
@@ -50,20 +50,20 @@ export const generatePaletteFromPrompt = async (prompt: string): Promise<{ name:
 
     const response = await ai.models.generateContent({
       model: modelId,
-      contents: `Create a color palette based on this description: "${prompt}". Return 5 distinct colors that work well together.`,
+      contents: `Crie uma paleta de cores baseada nesta descrição: "${prompt}". Retorne 5 cores distintas que funcionem bem juntas. Os nomes das cores devem ser criativos e em PORTUGUÊS DO BRASIL.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
             type: Type.OBJECT,
             properties: {
-                name: { type: Type.STRING, description: "A creative name for this palette" },
+                name: { type: Type.STRING, description: "Um nome criativo para esta paleta em Português" },
                 colors: {
                     type: Type.ARRAY,
                     items: {
                         type: Type.OBJECT,
                         properties: {
-                            hex: { type: Type.STRING, description: "Hex code including #" },
-                            name: { type: Type.STRING, description: "A creative name for the color" }
+                            hex: { type: Type.STRING, description: "Código Hex incluindo #" },
+                            name: { type: Type.STRING, description: "Um nome criativo para a cor em Português" }
                         }
                     }
                 }
@@ -72,7 +72,7 @@ export const generatePaletteFromPrompt = async (prompt: string): Promise<{ name:
       }
     });
      const text = response.text;
-    if (!text) throw new Error("No response from AI");
+    if (!text) throw new Error("Sem resposta da IA");
     return JSON.parse(text);
   } catch (error) {
     console.error("Gemini Generation Error:", error);
@@ -87,20 +87,20 @@ export const getColorFromDescription = async (description: string): Promise<stri
 
     const response = await ai.models.generateContent({
       model: modelId,
-      contents: `What is the standard hex color code for a color described as "${description}"? Return only the hex code.`,
+      contents: `Qual é o código de cor hex padrão para uma cor descrita como "${description}"? Retorne apenas o código hex.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            hex: { type: Type.STRING, description: "The hex code of the color, e.g. #FF0000" },
+            hex: { type: Type.STRING, description: "O código hex da cor, ex: #FF0000" },
           },
         },
       },
     });
 
     const text = response.text;
-    if (!text) throw new Error("No response from AI");
+    if (!text) throw new Error("Sem resposta da IA");
     const result = JSON.parse(text);
     return result.hex;
   } catch (error) {

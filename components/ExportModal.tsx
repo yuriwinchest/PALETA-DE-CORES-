@@ -33,7 +33,7 @@ ${colors.map(c => `  --color-${c.name.replace(/\s+/g, '-').toLowerCase()}: ${c.h
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-700 flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-slate-700">
-          <h2 className="text-xl font-bold text-white">Export Palette</h2>
+          <h2 className="text-xl font-bold text-white">Exportar Paleta</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition">
             <X size={24} />
           </button>
@@ -43,13 +43,13 @@ ${colors.map(c => `  --color-${c.name.replace(/\s+/g, '-').toLowerCase()}: ${c.h
           {/* CSS Section */}
           <div>
             <div className="flex justify-between items-center mb-2">
-               <label className="text-sm font-semibold text-slate-300">CSS Variables</label>
+               <label className="text-sm font-semibold text-slate-300">Variáveis CSS</label>
                <button 
                 onClick={() => handleCopy(generateCSS(), 'css')}
                 className="text-xs flex items-center gap-1 text-indigo-400 hover:text-indigo-300 transition"
                >
                  {copied === 'css' ? <Check size={14} /> : <Copy size={14} />}
-                 {copied === 'css' ? 'Copied!' : 'Copy CSS'}
+                 {copied === 'css' ? 'Copiado!' : 'Copiar CSS'}
                </button>
             </div>
             <pre className="bg-slate-900 p-4 rounded-lg text-xs text-slate-300 font-mono overflow-x-auto border border-slate-700">
@@ -60,13 +60,13 @@ ${colors.map(c => `  --color-${c.name.replace(/\s+/g, '-').toLowerCase()}: ${c.h
           {/* JSON Section */}
           <div>
              <div className="flex justify-between items-center mb-2">
-               <label className="text-sm font-semibold text-slate-300">JSON Data</label>
+               <label className="text-sm font-semibold text-slate-300">Dados JSON</label>
                <button 
                 onClick={() => handleCopy(generateJSON(), 'json')}
                 className="text-xs flex items-center gap-1 text-indigo-400 hover:text-indigo-300 transition"
                >
                  {copied === 'json' ? <Check size={14} /> : <Copy size={14} />}
-                 {copied === 'json' ? 'Copied!' : 'Copy JSON'}
+                 {copied === 'json' ? 'Copiado!' : 'Copiar JSON'}
                </button>
             </div>
             <pre className="bg-slate-900 p-4 rounded-lg text-xs text-slate-300 font-mono overflow-x-auto border border-slate-700">

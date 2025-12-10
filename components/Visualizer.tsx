@@ -39,7 +39,7 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
           <div className="flex-1 bg-slate-700 rounded px-3 py-1 text-xs text-slate-400 text-center font-mono">
-            website-preview.com
+            preview-site.com.br
           </div>
         </div>
 
@@ -50,12 +50,12 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
           <nav className="p-6 flex justify-between items-center" style={{ borderBottom: `1px solid ${secondaryAction}33` }}>
             <div className="font-bold text-2xl tracking-tight flex items-center gap-2">
               <Globe size={24} style={{ color: primaryAction }} />
-              <span>Brand</span>
+              <span>Marca</span>
             </div>
             <div className="hidden md:flex space-x-8 font-medium">
-              <span className="opacity-80 hover:opacity-100 cursor-pointer">Products</span>
-              <span className="opacity-80 hover:opacity-100 cursor-pointer">Solutions</span>
-              <span className="opacity-80 hover:opacity-100 cursor-pointer">Pricing</span>
+              <span className="opacity-80 hover:opacity-100 cursor-pointer">Produtos</span>
+              <span className="opacity-80 hover:opacity-100 cursor-pointer">Soluções</span>
+              <span className="opacity-80 hover:opacity-100 cursor-pointer">Preços</span>
             </div>
             <div className="flex items-center gap-4">
                <ShoppingCart size={20} className="opacity-70" />
@@ -68,26 +68,26 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
             <div className="md:w-1/2 space-y-6">
               <div className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-2" 
                    style={{ backgroundColor: secondaryAction, color: textOnSecondary }}>
-                New Collection
+                Nova Coleção
               </div>
               <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-                Design with <span style={{ color: primaryAction }}>Impact</span>.
+                Design com <span style={{ color: primaryAction }}>Impacto</span>.
               </h1>
               <p className="text-lg opacity-80 max-w-md leading-relaxed">
-                Experience the perfect harmony of color and structure. This simulates how your palette applies to real-world interface elements.
+                Experimente a harmonia perfeita de cores e estrutura. Isso simula como sua paleta se aplica a elementos reais de interface.
               </p>
               <div className="flex gap-4 pt-4">
                 <button 
                   className="px-8 py-4 rounded-lg font-bold shadow-lg transform transition hover:-translate-y-1 flex items-center gap-2"
                   style={{ backgroundColor: primaryAction, color: textOnPrimary }}
                 >
-                  Get Started <ArrowRight size={18} />
+                  Começar <ArrowRight size={18} />
                 </button>
                 <button 
                   className="px-8 py-4 rounded-lg font-bold border-2 transition hover:bg-black/5"
                   style={{ borderColor: textOnBgMain, color: textOnBgMain }}
                 >
-                  Learn More
+                  Saiba Mais
                 </button>
               </div>
             </div>
@@ -99,7 +99,7 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
                      style={{ backgroundImage: `radial-gradient(circle at 30% 30%, ${primaryAction} 0%, transparent 50%)`}}></div>
                 <div className="text-center p-8 backdrop-blur-sm bg-white/10 rounded-xl border border-white/20">
                    <Star size={48} className="mx-auto mb-4" style={{ color: primaryAction }} />
-                   <h3 className="text-2xl font-bold" style={{ color: getContrastTextColor(bgSecondary) }}>Premium Quality</h3>
+                   <h3 className="text-2xl font-bold" style={{ color: getContrastTextColor(bgSecondary) }}>Qualidade Premium</h3>
                 </div>
             </div>
           </header>
@@ -113,8 +113,8 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
                          style={{ backgroundColor: primaryAction, color: textOnPrimary }}>
                       {i}
                     </div>
-                    <h4 className="text-xl font-bold mb-2">Feature {i}</h4>
-                    <p className="opacity-70 text-sm">Automated color application allows you to verify accessibility and aesthetic balance instantly.</p>
+                    <h4 className="text-xl font-bold mb-2">Recurso {i}</h4>
+                    <p className="opacity-70 text-sm">A aplicação automática de cores permite verificar a acessibilidade e o equilíbrio estético instantaneamente.</p>
                   </div>
                 ))}
              </div>

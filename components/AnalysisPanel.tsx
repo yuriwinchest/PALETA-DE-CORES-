@@ -16,10 +16,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <BrainCircuit className="text-purple-400" />
-            AI Insights
+            Insights IA
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Discover the psychological impact and best use-cases for your palette.
+            Descubra o impacto psicológico e os melhores usos para sua paleta.
           </p>
         </div>
         <button
@@ -34,12 +34,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              Analyzing...
+              Analisando...
             </>
           ) : (
             <>
               <Sparkles size={18} />
-              Generate Analysis
+              Gerar Análise
             </>
           )}
         </button>
@@ -48,7 +48,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
       {!analysis && !isLoading && (
         <div className="flex-1 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700 rounded-xl p-8">
           <BrainCircuit size={48} className="mb-4 opacity-50" />
-          <p>Click "Generate Analysis" to reveal the secrets of your colors.</p>
+          <p>Clique em "Gerar Análise" para revelar os segredos das suas cores.</p>
         </div>
       )}
 
@@ -56,7 +56,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
         <div className="space-y-6 animate-fade-in">
           {/* Overall Vibe Card */}
           <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-xl">
-            <h3 className="text-lg font-semibold text-purple-300 mb-2">Overall Vibe</h3>
+            <h3 className="text-lg font-semibold text-purple-300 mb-2">Vibe Geral</h3>
             <p className="text-slate-200 leading-relaxed italic">
               "{analysis.overallVibe}"
             </p>
@@ -83,13 +83,13 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                           <Info size={12} /> Psychology
+                           <Info size={12} /> Psicologia
                         </div>
                         <p className="text-sm text-slate-300">{item.psychology}</p>
                       </div>
                       <div>
                          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                           <Tag size={12} /> Best Usage
+                           <Tag size={12} /> Melhor Uso
                         </div>
                         <p className="text-sm text-emerald-400 bg-emerald-400/10 inline-block px-2 py-1 rounded">
                           {item.recommendedUsage}

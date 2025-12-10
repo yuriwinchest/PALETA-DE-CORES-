@@ -12,11 +12,11 @@ import ExportModal from './components/ExportModal';
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from './services/geminiService';
 
 const DEFAULT_COLORS: ColorDef[] = [
-  { id: '1', hex: '#2563EB', name: 'Royal Blue' },
-  { id: '2', hex: '#1E293B', name: 'Slate Dark' },
-  { id: '3', hex: '#F8FAFC', name: 'Slate Light' },
-  { id: '4', hex: '#10B981', name: 'Emerald' },
-  { id: '5', hex: '#F59E0B', name: 'Amber' },
+  { id: '1', hex: '#2563EB', name: 'Azul Real' },
+  { id: '2', hex: '#1E293B', name: 'Ardósia Escura' },
+  { id: '3', hex: '#F8FAFC', name: 'Gelo Claro' },
+  { id: '4', hex: '#10B981', name: 'Esmeralda' },
+  { id: '5', hex: '#F59E0B', name: 'Âmbar' },
 ];
 
 export default function App() {
@@ -43,7 +43,7 @@ export default function App() {
   const addColor = () => {
     setColors(prev => [
       ...prev, 
-      { id: generateId(), hex: '#000000', name: 'New Color' }
+      { id: generateId(), hex: '#000000', name: 'Nova Cor' }
     ]);
   };
 
@@ -64,7 +64,7 @@ export default function App() {
       }));
 
     } catch (err) {
-      alert("Failed to analyze palette. Please check API key.");
+      alert("Falha ao analisar a paleta. Por favor, verifique sua chave API.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -85,7 +85,7 @@ export default function App() {
       setAnalysis(null); // Clear old analysis
       setPrompt('');
     } catch (err) {
-        alert("Failed to generate palette.");
+        alert("Falha ao gerar paleta.");
     } finally {
       setIsGenerating(false);
     }
@@ -99,7 +99,7 @@ export default function App() {
       const hex = await getColorFromDescription(description);
       updateColor(id, { hex });
     } catch (error) {
-      console.error("Failed to find color");
+      console.error("Falha ao encontrar cor");
     } finally {
       setLoadingColorIds(prev => {
         const next = new Set(prev);
@@ -130,7 +130,7 @@ export default function App() {
             <Palette size={20} className="text-white" />
           </div>
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.0</span>
+            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.1</span>
           </h1>
         </div>
 
@@ -147,19 +147,20 @@ export default function App() {
                 onClick={() => setViewMode(ViewMode.VISUALIZER)}
                 className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.VISUALIZER ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
-                <LayoutTemplate size={16} /> Preview
+                <LayoutTemplate size={16} /> Visualizar
               </button>
               <button 
                 onClick={() => setViewMode(ViewMode.ANALYSIS)}
                 className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.ANALYSIS ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
-                <BrainCircuit size={16} /> Insights
+                <BrainCircuit size={16} /> Análise
               </button>
            </div>
            
            <button 
             onClick={() => setShowExport(true)}
             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+            title="Exportar"
            >
              <Download size={20} />
            </button>
@@ -175,14 +176,14 @@ export default function App() {
           {/* AI Generator Input */}
           <div className="p-6 border-b border-slate-800">
              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block flex items-center gap-1">
-               <Wand2 size={12} /> AI Generator
+               <Wand2 size={12} /> Gerador com IA
              </label>
              <form onSubmit={handleGenerate} className="relative">
                <input 
                   type="text" 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., 'Sunset in Tokyo' or 'Cyberpunk Cafe'"
+                  placeholder="ex: 'Pôr do sol em Tóquio' ou 'Café Cyberpunk'"
                   className="w-full bg-slate-800 text-sm text-white placeholder-slate-500 rounded-lg px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                />
                <button 
@@ -198,8 +199,8 @@ export default function App() {
           {/* Color List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             <div className="flex justify-between items-center mb-2">
-               <h3 className="text-sm font-bold text-slate-300">Active Palette</h3>
-               <span className="text-xs text-slate-500">{colors.length} colors</span>
+               <h3 className="text-sm font-bold text-slate-300">Paleta Ativa</h3>
+               <span className="text-xs text-slate-500">{colors.length} cores</span>
             </div>
             
             {colors.map((color, index) => (
@@ -233,12 +234,12 @@ export default function App() {
                         }
                       }}
                       className="bg-transparent text-sm font-semibold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-500 pr-6"
-                      placeholder="e.g. 'Sky Blue'"
+                      placeholder="ex: 'Azul Céu'"
                     />
                      <button
                         onClick={() => handleMagicColorLookup(color.id, color.name)}
                         className={`absolute right-0 top-0 text-indigo-400 hover:text-indigo-300 transition ${!color.name ? 'opacity-0' : 'opacity-100'}`}
-                        title="AI Color Lookup (Type name & click)"
+                        title="Busca de Cor IA (Digite o nome e clique)"
                         disabled={loadingColorIds.has(color.id)}
                       >
                         {loadingColorIds.has(color.id) ? (
@@ -274,7 +275,7 @@ export default function App() {
               onClick={addColor}
               className="w-full py-3 rounded-xl border-2 border-dashed border-slate-700 text-slate-500 hover:border-indigo-500 hover:text-indigo-400 transition flex items-center justify-center gap-2 font-medium"
             >
-              <Plus size={18} /> Add Color
+              <Plus size={18} /> Adicionar Cor
             </button>
           </div>
         </aside>
@@ -285,13 +286,13 @@ export default function App() {
              <div className="h-full flex items-center justify-center text-slate-500 p-8 text-center">
                 <div className="max-w-md">
                    <LayoutTemplate size={64} className="mx-auto mb-6 opacity-20" />
-                   <h2 className="text-2xl font-bold text-slate-300 mb-2">Ready to Design</h2>
-                   <p className="mb-8">Use the sidebar to define your colors. Switch to "Preview" to see them in action or "Insights" for AI analysis.</p>
+                   <h2 className="text-2xl font-bold text-slate-300 mb-2">Pronto para Criar</h2>
+                   <p className="mb-8">Use a barra lateral para definir suas cores. Mude para "Visualizar" para vê-las em ação ou "Análise" para insights da IA.</p>
                    <button 
                       onClick={() => setViewMode(ViewMode.VISUALIZER)}
                       className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition"
                     >
-                      Open Preview
+                      Abrir Visualização
                    </button>
                 </div>
              </div>
