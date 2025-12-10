@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Palette, Plus, Trash2, LayoutTemplate, 
   BrainCircuit, Download, RefreshCw, Wand2, 
-  SlidersHorizontal, GripVertical, Sparkles
+  SlidersHorizontal, Sparkles
 } from 'lucide-react';
 import { ColorDef, ViewMode, AIAnalysisResult } from './types';
 import { generateId, getContrastTextColor } from './utils';
