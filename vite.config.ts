@@ -10,8 +10,10 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      // Injects the API_KEY from Vercel environment variables into the client-side code
-      'process.env.API_KEY': JSON.stringify(env.API_KEY)
+      // Injects the environment variables into the client-side code at build time
+      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      'process.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
+      'process.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY)
     }
   };
 });

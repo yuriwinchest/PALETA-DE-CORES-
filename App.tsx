@@ -1,16 +1,19 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Palette as PaletteIcon, Plus, Trash2, LayoutTemplate, 
   BrainCircuit, Download, RefreshCw, Wand2, 
-  SlidersHorizontal, Sparkles, Save, FolderOpen, FilePlus
+  SlidersHorizontal, Sparkles, Save, FolderOpen, FilePlus, UserCircle, LogOut
 } from 'lucide-react';
 import { ColorDef, ViewMode, AIAnalysisResult, Palette } from './types';
-import { generateId, getContrastTextColor } from './utils';
+import { generateId } from './utils';
 import Visualizer from './components/Visualizer';
 import AnalysisPanel from './components/AnalysisPanel';
 import ExportModal from './components/ExportModal';
 import PaletteLibraryModal from './components/PaletteLibraryModal';
+import AuthModal from './components/AuthModal';
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from './services/geminiService';
+import { supabase } from './services/supabaseClient';
 
 const DEFAULT_COLORS: ColorDef[] = [
   { id: '1', hex: '#2563EB', name: 'Azul Real' },
@@ -21,6 +24,7 @@ const DEFAULT_COLORS: ColorDef[] = [
 ];
 
 export default function App() {
+  // App State
   const [colors, setColors] = useState<ColorDef[]>(DEFAULT_COLORS);
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.EDITOR);
   const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
@@ -30,49 +34,95 @@ export default function App() {
   const [showExport, setShowExport] = useState(false);
   const [loadingColorIds, setLoadingColorIds] = useState<Set<string>>(new Set());
 
-  // Palette Management State
+  // Palette & User Management State
   const [savedPalettes, setSavedPalettes] = useState<Palette[]>([]);
   const [showLibrary, setShowLibrary] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
   const [paletteName, setPaletteName] = useState("Minha Paleta");
   const [currentPaletteId, setCurrentPaletteId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
-  // Load palettes from localStorage on mount
+  // Initialize Auth & Data
   useEffect(() => {
-    const saved = localStorage.getItem('chromaflow_palettes');
-    if (saved) {
-      try {
-        setSavedPalettes(JSON.parse(saved));
-      } catch (e) {
-        console.error("Erro ao carregar paletas", e);
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchPalettes(session.user.id);
+      } else {
+        // Fallback to local storage if not logged in (optional, keeping for compatibility)
+        const localSaved = localStorage.getItem('chromaflow_palettes');
+        if (localSaved) setSavedPalettes(JSON.parse(localSaved));
       }
-    }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchPalettes(session.user.id);
+      } else {
+        setSavedPalettes([]); // Clear palettes on logout
+        // Or load local storage fallback
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const saveToLocalStorage = (palettes: Palette[]) => {
-    localStorage.setItem('chromaflow_palettes', JSON.stringify(palettes));
+  const fetchPalettes = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('palettes')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching palettes:', error);
+    } else {
+      setSavedPalettes(data as Palette[]);
+    }
   };
 
-  const handleSavePalette = () => {
-    const idToUse = currentPaletteId || generateId();
-    const newPalette: Palette = {
-      id: idToUse,
-      name: paletteName,
-      colors: colors,
-      description: analysis?.overallVibe || `Criada em ${new Date().toLocaleDateString('pt-BR')}`
-    };
-
-    const updated = [...savedPalettes];
-    const index = updated.findIndex(p => p.id === idToUse);
-    if (index >= 0) {
-      updated[index] = newPalette;
-    } else {
-      updated.push(newPalette);
+  const handleSavePalette = async () => {
+    if (!user) {
+      setShowAuth(true);
+      return;
     }
 
-    setSavedPalettes(updated);
-    saveToLocalStorage(updated);
-    setCurrentPaletteId(idToUse);
-    // Could add toast notification here
+    const description = analysis?.overallVibe || `Criada em ${new Date().toLocaleDateString('pt-BR')}`;
+    
+    // If it's an update (we have an ID and it matches a saved palette)
+    if (currentPaletteId) {
+       const { error } = await supabase
+        .from('palettes')
+        .update({ 
+          name: paletteName, 
+          colors: colors, 
+          description 
+        })
+        .eq('id', currentPaletteId);
+      
+       if (error) alert("Erro ao atualizar.");
+       else fetchPalettes(user.id);
+    } else {
+       // Insert new
+       const { data, error } = await supabase
+        .from('palettes')
+        .insert([{
+          user_id: user.id,
+          name: paletteName,
+          colors: colors,
+          description
+        }])
+        .select();
+
+        if (error) alert("Erro ao salvar.");
+        else if (data) {
+          setCurrentPaletteId(data[0].id);
+          fetchPalettes(user.id);
+        }
+    }
   };
 
   const handleLoadPalette = (palette: Palette) => {
@@ -83,17 +133,30 @@ export default function App() {
     setShowLibrary(false);
   };
 
-  const handleDeletePalette = (id: string) => {
-    const updated = savedPalettes.filter(p => p.id !== id);
-    setSavedPalettes(updated);
-    saveToLocalStorage(updated);
-    if (currentPaletteId === id) {
-      setCurrentPaletteId(null);
+  const handleDeletePalette = async (id: string) => {
+    if (!user) return;
+    
+    const { error } = await supabase
+      .from('palettes')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      alert("Erro ao deletar paleta.");
+    } else {
+      fetchPalettes(user.id);
+      if (currentPaletteId === id) {
+        setCurrentPaletteId(null);
+      }
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   const handleNewPalette = () => {
-    setColors(DEFAULT_COLORS.map(c => ({...c, id: generateId()}))); // Clone defaults with new IDs
+    setColors(DEFAULT_COLORS.map(c => ({...c, id: generateId()}))); 
     setPaletteName("Nova Paleta");
     setCurrentPaletteId(null);
     setAnalysis(null);
@@ -124,7 +187,6 @@ export default function App() {
       const result = await analyzePaletteWithGemini(colors);
       setAnalysis(result);
       
-      // Store analysis results in the color definitions
       setColors(prev => prev.map(c => {
         const analysisData = result.colorAnalysis.find(a => a.hex.toLowerCase() === c.hex.toLowerCase());
         return analysisData ? { 
@@ -135,7 +197,7 @@ export default function App() {
       }));
 
     } catch (err) {
-      alert("Falha ao analisar a paleta. Por favor, verifique sua chave API.");
+      alert("Falha ao analisar a paleta. Por favor, tente novamente.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -154,7 +216,7 @@ export default function App() {
       }));
       setColors(newColors);
       setPaletteName(result.name || prompt);
-      setCurrentPaletteId(null); // Reset ID as this is a new generation
+      setCurrentPaletteId(null);
       setAnalysis(null);
       setPrompt('');
     } catch (err) {
@@ -202,33 +264,35 @@ export default function App() {
             <PaletteIcon size={20} className="text-white" />
           </div>
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.2</span>
+            ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.3</span>
           </h1>
         </div>
 
         <div className="flex items-center gap-4">
            {/* View Switcher */}
-           <div className="bg-slate-800 p-1 rounded-lg flex gap-1 border border-slate-700">
+           <div className="bg-slate-800 p-1 rounded-lg flex gap-1 border border-slate-700 hidden sm:flex">
               <button 
                 onClick={() => setViewMode(ViewMode.EDITOR)}
                 className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.EDITOR ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
-                <SlidersHorizontal size={16} /> Editor
+                <SlidersHorizontal size={16} /> <span className="hidden lg:inline">Editor</span>
               </button>
               <button 
                 onClick={() => setViewMode(ViewMode.VISUALIZER)}
                 className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.VISUALIZER ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
-                <LayoutTemplate size={16} /> Visualizar
+                <LayoutTemplate size={16} /> <span className="hidden lg:inline">Visualizar</span>
               </button>
               <button 
                 onClick={() => setViewMode(ViewMode.ANALYSIS)}
                 className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition ${viewMode === ViewMode.ANALYSIS ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
-                <BrainCircuit size={16} /> Análise
+                <BrainCircuit size={16} /> <span className="hidden lg:inline">Análise</span>
               </button>
            </div>
            
+           <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
+
            <button 
             onClick={() => setShowExport(true)}
             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
@@ -236,6 +300,26 @@ export default function App() {
            >
              <Download size={20} />
            </button>
+
+           {user ? (
+             <div className="flex items-center gap-3 bg-slate-800/50 py-1 pl-3 pr-1 rounded-full border border-slate-700">
+                <span className="text-xs text-slate-300 max-w-[100px] truncate">{user.email}</span>
+                <button 
+                  onClick={handleLogout}
+                  className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-full text-slate-300 transition"
+                  title="Sair"
+                >
+                  <LogOut size={14} />
+                </button>
+             </div>
+           ) : (
+             <button
+               onClick={() => setShowAuth(true)}
+               className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition border border-slate-700"
+             >
+               <UserCircle size={18} /> Entrar
+             </button>
+           )}
         </div>
       </header>
 
@@ -266,7 +350,13 @@ export default function App() {
                   <FilePlus size={14} /> Novo
                 </button>
                 <button 
-                  onClick={() => setShowLibrary(true)}
+                  onClick={() => {
+                    if(!user) {
+                      setShowAuth(true);
+                    } else {
+                      setShowLibrary(true);
+                    }
+                  }}
                   className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-slate-700"
                   title="Abrir Projeto"
                 >
@@ -430,6 +520,11 @@ export default function App() {
         palettes={savedPalettes}
         onLoad={handleLoadPalette}
         onDelete={handleDeletePalette}
+      />
+
+      <AuthModal 
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
       />
     </div>
   );
