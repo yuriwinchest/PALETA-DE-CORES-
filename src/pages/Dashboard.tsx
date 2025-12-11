@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Palette as PaletteIcon, Plus, Trash2, LayoutTemplate,
-    BrainCircuit, Download, RefreshCw, Wand2,
-    SlidersHorizontal, Sparkles, Save, FolderOpen, FilePlus, UserCircle, LogOut
-} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStackApp, useUser } from "@stackframe/react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+    Palette as PaletteIcon, Plus, Trash2, LayoutTemplate,
+    BrainCircuit, Download, RefreshCw, Wand2,
+    SlidersHorizontal, Sparkles, Save, FolderOpen, FilePlus, UserCircle, LogOut, Pipette
+} from 'lucide-react';
 import { ColorDef, ViewMode, AIAnalysisResult, Palette } from '../types';
 import { generateId } from '../utils';
 import Visualizer from '../components/Visualizer';
 import AnalysisPanel from '../components/AnalysisPanel';
 import ExportModal from '../components/ExportModal';
 import PaletteLibraryModal from '../components/PaletteLibraryModal';
+import ImageColorPicker from '../components/ImageColorPicker';
+import FeatureCards from '../components/FeatureCards';
+import GeneratePage from '../components/features/GeneratePage';
+import MeaningPage from '../components/features/MeaningPage';
+import VisualizePage from '../components/features/VisualizePage';
 import { analyzePaletteWithGemini, generatePaletteFromPrompt, getColorFromDescription } from '../services/geminiService';
 
 const DEFAULT_COLORS: ColorDef[] = [
@@ -23,10 +28,15 @@ const DEFAULT_COLORS: ColorDef[] = [
     { id: '5', hex: '#F59E0B', name: 'Âmbar' },
 ];
 
-export default function Dashboard() {
+interface DashboardProps {
+    initialViewMode?: ViewMode;
+    isDemo?: boolean;
+}
+
+export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = false }: DashboardProps) {
     // App State
     const [colors, setColors] = useState<ColorDef[]>(DEFAULT_COLORS);
-    const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.EDITOR);
+    const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode); // Default to HOME or prop
     const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -143,6 +153,32 @@ export default function Dashboard() {
         navigate('/');
     };
 
+    const handleRestrictedAction = () => {
+        if (!user) {
+            navigate('/sign-in');
+            return true;
+        }
+        return false;
+    };
+
+    const handleViewSwitch = (mode: ViewMode) => {
+        // Allow switching strictly between Visualizer and Editor (as Editor is just the palette state check)
+        // OR strictly enforce "Only Visualize" as per request.
+        // Request: "only test mount the color and visualize".
+        // "Test mount" implies using the sidebar.
+        // "Visualize" implies ViewMode.VISUALIZER.
+
+        if (mode === ViewMode.VISUALIZER) {
+            setViewMode(mode);
+            return;
+        }
+
+        // If trying to access other modes in demo/guest state
+        if (handleRestrictedAction()) return;
+
+        setViewMode(mode);
+    };
+
     const handleNewPalette = () => {
         setColors(DEFAULT_COLORS.map(c => ({ ...c, id: generateId() })));
         setPaletteName("Nova Paleta");
@@ -169,6 +205,14 @@ export default function Dashboard() {
         ]);
     };
 
+    const handleAddColorFromImage = (hex: string) => {
+        setColors(prev => [
+            ...prev,
+            { id: generateId(), hex, name: 'Cor Extraída' }
+        ]);
+        alert(`Cor ${hex} adicionada à paleta!`);
+    };
+
     const handleAnalyze = async () => {
         setIsAnalyzing(true);
         try {
@@ -193,6 +237,7 @@ export default function Dashboard() {
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (handleRestrictedAction()) return;
         if (!prompt.trim()) return;
         setIsGenerating(true);
         try {
@@ -216,6 +261,7 @@ export default function Dashboard() {
 
     const handleMagicColorLookup = async (id: string, description: string) => {
         if (!description.trim()) return;
+        if (handleRestrictedAction()) return;
 
         setLoadingColorIds(prev => new Set(prev).add(id));
         try {
@@ -247,7 +293,10 @@ export default function Dashboard() {
 
             {/* Header */}
             <header className="h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0 sticky top-0 shadow-sm">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
+                    if (user) setViewMode(ViewMode.HOME);
+                    else handleRestrictedAction();
+                }}>
                     <motion.div
                         initial={{ rotate: -90, opacity: 0 }}
                         animate={{ rotate: 0, opacity: 1 }}
@@ -257,7 +306,7 @@ export default function Dashboard() {
                         <PaletteIcon size={20} className="text-white" />
                     </motion.div>
                     <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-                        ChromaFlow <span className="text-xs text-slate-500 font-normal ml-2">v1.3</span>
+                        Estudo das Cores <span className="text-xs text-slate-500 font-normal ml-2">v1.4</span>
                     </h1>
                 </div>
 
@@ -265,7 +314,7 @@ export default function Dashboard() {
                     {/* View Switcher */}
                     <div className="bg-slate-800/50 p-1 rounded-lg flex gap-1 border border-white/10 hidden sm:flex backdrop-blur-sm">
                         <button
-                            onClick={() => setViewMode(ViewMode.EDITOR)}
+                            onClick={() => handleViewSwitch(ViewMode.EDITOR)}
                             className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.EDITOR ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
                             {viewMode === ViewMode.EDITOR && (
@@ -274,7 +323,7 @@ export default function Dashboard() {
                             <span className="relative z-10 flex items-center gap-2"><SlidersHorizontal size={16} /> <span className="hidden lg:inline">Editor</span></span>
                         </button>
                         <button
-                            onClick={() => setViewMode(ViewMode.VISUALIZER)}
+                            onClick={() => handleViewSwitch(ViewMode.VISUALIZER)}
                             className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.VISUALIZER ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
                             {viewMode === ViewMode.VISUALIZER && (
@@ -283,7 +332,7 @@ export default function Dashboard() {
                             <span className="relative z-10 flex items-center gap-2"><LayoutTemplate size={16} /> <span className="hidden lg:inline">Visualizar</span></span>
                         </button>
                         <button
-                            onClick={() => setViewMode(ViewMode.ANALYSIS)}
+                            onClick={() => handleViewSwitch(ViewMode.ANALYSIS)}
                             className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.ANALYSIS ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                         >
                             {viewMode === ViewMode.ANALYSIS && (
@@ -291,12 +340,23 @@ export default function Dashboard() {
                             )}
                             <span className="relative z-10 flex items-center gap-2"><BrainCircuit size={16} /> <span className="hidden lg:inline">Análise</span></span>
                         </button>
+                        <button
+                            onClick={() => handleViewSwitch(ViewMode.EXTRACTOR)}
+                            className={`px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition relative ${viewMode === ViewMode.EXTRACTOR ? 'text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            {viewMode === ViewMode.EXTRACTOR && (
+                                <motion.div layoutId="tab-bg" className="absolute inset-0 bg-indigo-600 rounded shadow-sm" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                            )}
+                            <span className="relative z-10 flex items-center gap-2"><Pipette size={16} /> <span className="hidden lg:inline">Extrair</span></span>
+                        </button>
                     </div>
 
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
 
                     <button
-                        onClick={() => setShowExport(true)}
+                        onClick={() => {
+                            if (!handleRestrictedAction()) setShowExport(true);
+                        }}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
                         title="Exportar"
                     >
@@ -328,8 +388,8 @@ export default function Dashboard() {
             {/* Main Content */}
             <main className="flex-1 flex overflow-hidden">
 
-                {/* Left Sidebar: Palette Builder */}
-                <aside className={`w-full md:w-80 lg:w-96 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 ${viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex'}`}>
+                {/* Left Sidebar: Palette Builder - Hidden on HOME and Feature Pages */}
+                <aside className={`w-full md:w-80 lg:w-96 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 ${viewMode === ViewMode.HOME || viewMode === ViewMode.FEATURE_GENERATE || viewMode === ViewMode.FEATURE_MEANING ? 'hidden' : (viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex')}`}>
 
                     {/* Palette Management Section */}
                     <div className="p-6 pb-4 border-b border-white/5 space-y-3">
@@ -543,6 +603,80 @@ export default function Dashboard() {
                                     analysis={analysis}
                                     isLoading={isAnalyzing}
                                     onAnalyze={handleAnalyze}
+                                />
+                            </motion.div>
+                        )}
+
+                        {viewMode === ViewMode.EXTRACTOR && (
+                            <motion.div
+                                key="extractor"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.05 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <ImageColorPicker onAddColor={handleAddColorFromImage} />
+                            </motion.div>
+                        )}
+
+                        {viewMode === ViewMode.HOME && (
+                            <motion.div
+                                key="home"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <FeatureCards onNavigate={setViewMode} />
+                            </motion.div>
+                        )}
+
+                        {viewMode === ViewMode.FEATURE_GENERATE && (
+                            <motion.div
+                                key="feature-generate"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <GeneratePage
+                                    onStart={() => setViewMode(ViewMode.EDITOR)} // Or switch to specific layout if we want to auto-focus prompt
+                                    onBack={() => setViewMode(ViewMode.HOME)}
+                                />
+                            </motion.div>
+                        )}
+
+                        {viewMode === ViewMode.FEATURE_MEANING && (
+                            <motion.div
+                                key="feature-meaning"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <MeaningPage
+                                    onStart={() => setViewMode(ViewMode.ANALYSIS)}
+                                    onBack={() => setViewMode(ViewMode.HOME)}
+                                />
+                            </motion.div>
+                        )}
+
+                        {viewMode === ViewMode.FEATURE_VISUALIZE && (
+                            <motion.div
+                                key="feature-visualize"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full w-full"
+                            >
+                                <VisualizePage
+                                    onStart={() => setViewMode(ViewMode.VISUALIZER)}
+                                    onBack={() => setViewMode(ViewMode.HOME)}
                                 />
                             </motion.div>
                         )}

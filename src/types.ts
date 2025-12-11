@@ -16,9 +16,14 @@ export interface Palette {
 }
 
 export enum ViewMode {
+  HOME = 'HOME',
   EDITOR = 'EDITOR',
   VISUALIZER = 'VISUALIZER',
-  ANALYSIS = 'ANALYSIS'
+  ANALYSIS = 'ANALYSIS',
+  EXTRACTOR = 'EXTRACTOR',
+  FEATURE_GENERATE = 'FEATURE_GENERATE',
+  FEATURE_MEANING = 'FEATURE_MEANING',
+  FEATURE_VISUALIZE = 'FEATURE_VISUALIZE'
 }
 
 export interface AIAnalysisResult {

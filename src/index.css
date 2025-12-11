@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
 
 .glass {
   background-color: rgba(255, 255, 255, 0.05);
@@ -8,6 +7,32 @@
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+
+/* Stack Auth Overrides - Force Transparency */
+:root {
+  --stack-card-background: transparent;
+  --stack-card-border: 0px solid transparent;
+  --stack-card-shadow: none;
+}
+
+div[data-stack-card="true"],
+.stack-card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Aggressive transparency for children of the glass container */
+.glass-login>div,
+.glass-login>div>div,
+.glass-login form,
+.glass-login [data-stack-card] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 
 
 :root {

@@ -1,14 +1,17 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ColorDef } from '../types';
 import { getContrastTextColor } from '../utils';
 import { Globe, ShoppingCart, User, ArrowRight, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import BackButton from './BackButton';
 
 interface VisualizerProps {
   colors: ColorDef[];
 }
 
 const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
+  const navigate = useNavigate();
   const safeColors = useMemo(() => {
     if (colors.length === 0) return Array(5).fill({ hex: '#ccc' });
     const filled = [...colors];
@@ -29,7 +32,16 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
   const textOnSecondary = getContrastTextColor(secondaryAction);
 
   return (
-    <div className="w-full h-full bg-slate-950 p-4 overflow-y-auto flex items-center justify-center pb-20">
+    <div className="w-full h-full bg-slate-950 p-4 overflow-y-auto flex items-center justify-center pb-20 relative">
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 z-50 px-4 py-2 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg backdrop-blur-sm border border-white/10 transition-colors text-sm font-medium flex items-center gap-2"
+      >
+        ← Voltar
+      </button>
+
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -104,13 +116,14 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
 
               <div className="flex flex-wrap gap-4 pt-4">
                 <button
-                  className="px-8 py-4 rounded-xl font-bold shadow-xl shadow-black/5 transform transition hover:-translate-y-1 hover:shadow-2xl flex items-center gap-2 active:scale-95"
+                  onClick={() => navigate('/app')}
+                  className="px-8 py-4 rounded-xl font-bold shadow-xl shadow-black/5 transform transition hover:-translate-y-1 hover:shadow-2xl flex items-center gap-2 active:scale-95 cursor-pointer"
                   style={{ backgroundColor: primaryAction, color: textOnPrimary }}
                 >
                   Começar Agora <ArrowRight size={18} />
                 </button>
                 <button
-                  className="px-8 py-4 rounded-xl font-bold border-2 transition hover:bg-black/5 active:scale-95"
+                  className="px-8 py-4 rounded-xl font-bold border-2 transition hover:bg-black/5 active:scale-95 cursor-pointer"
                   style={{ borderColor: textOnBgMain, color: textOnBgMain }}
                 >
                   Ver Demo

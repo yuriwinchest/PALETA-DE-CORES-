@@ -17,9 +17,11 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <StackProvider app={stack}>
+      <StackProvider app={stack} lang="pt-BR">
         <TooltipProvider>
-          <App />
+          <React.Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Carregando aplicação...</div>}>
+            <App />
+          </React.Suspense>
         </TooltipProvider>
       </StackProvider>
     </BrowserRouter>

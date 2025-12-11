@@ -2,14 +2,7 @@ import { ArrowRight, Palette as PaletteIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser, useStackApp } from "@stackframe/react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-
-// Generate array [slide-1.png, ..., slide-10.png]
-// Using exact same images for consistency or different? User said "fotos para cada uma das duas paginas".
-// But implied "dar as foto" (give the photos). So likely shares the same pool or user will rename.
-// Let's assume user drops 10 photos and they are used in both or randomized.
-// Let's use the same pool `slide-1` to `slide-10` for now to make it easy for user (just one folder to fill).
-const heroImages = Array.from({ length: 10 }, (_, i) => `/assets/slideshow/slide-${i + 1}.png`);
+import { useState } from "react";
 
 export default function Landing() {
     const user = useUser();
@@ -19,64 +12,50 @@ export default function Landing() {
     const heroY = useTransform(scrollY, [0, 500], [0, 150]);
     const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
-    // Slideshow Logic
-    const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
-        }, 5000); // 5 seconds per slide as requested
-        return () => clearInterval(interval);
-    }, []);
-
     return (
-        <div className="min-h-screen bg-black text-slate-100 overflow-x-hidden">
+        <div className="min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden">
 
             {/* Minimal Header */}
-            {/* Minimal Header - Button Only */}
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex items-center justify-end"
+                className="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex items-center justify-between backdrop-blur-md bg-slate-950/80"
             >
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <PaletteIcon size={18} className="text-white" />
+                    </div>
+                    <span className="text-lg font-bold">Estudo das Cores</span>
+                </div>
                 <button
                     onClick={() => {
                         if (user) navigate('/app');
                         else navigate('/sign-in');
                     }}
-                    className="px-6 py-2 bg-white text-slate-900 rounded-full font-semibold hover:scale-105 transition-transform shadow-lg"
+                    className="px-6 py-2 bg-white text-slate-900 rounded-full font-semibold hover:scale-105 transition-transform"
                 >
                     {user ? "Painel" : "Entrar"}
                 </button>
             </motion.header>
 
-            {/* Hero Section - Fullscreen com Parallax e Slideshow */}
-            <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
-                {/* Background Slideshow */}
+            {/* Hero Section - Fullscreen com Parallax */}
+            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                {/* Background Image com Parallax */}
                 <motion.div
-                    style={{ y: heroY, opacity: heroOpacity }} // Parallax affects container
+                    style={{ y: heroY, opacity: heroOpacity }}
                     className="absolute inset-0 z-0"
                 >
-                    <AnimatePresence mode="popLayout">
-                        <motion.div
-                            key={currentHeroIndex}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1.5, ease: "easeInOut" }}
-                            className="absolute inset-0 w-full h-full bg-black"
-                        >
-                            <img
-                                src={heroImages[currentHeroIndex]}
-                                alt="Slideshow"
-                                className="w-full h-full object-cover object-center opacity-60"
-                            />
-                        </motion.div>
-                    </AnimatePresence>
+                    <div
+                        className="w-full h-full bg-cover bg-center"
+                        style={{
+                            backgroundImage: 'url(/assets/images/hero-paint.png)',
+                            filter: 'brightness(0.4)'
+                        }}
+                    />
                 </motion.div>
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950 z-10" />
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 via-transparent to-slate-950 z-10" />
 
                 {/* Hero Content */}
                 <div className="relative z-20 text-center px-6 max-w-5xl">
@@ -174,7 +153,7 @@ export default function Landing() {
                                 title: "Significados",
                                 desc: "Entenda as Cores",
                                 description: "Descubra a psicologia por trás de cada tom e o que elas despertam.",
-                                image: "/assets/images/foto-do-card.png",
+                                image: "/assets/images/card-export.png", // Or similar
                                 gradient: "from-emerald-400 via-teal-500 to-cyan-600",
                                 route: "/meanings"
                             }
@@ -246,54 +225,48 @@ export default function Landing() {
                 </motion.div>
             </section>
 
-            {/* Footer Refinado e Centralizado */}
-            <footer className="py-20 px-6 bg-[#020617] relative overflow-hidden border-t border-white/5">
-                {/* Background Glows */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none"></div>
-
-                <div className="max-w-4xl mx-auto relative z-10 text-center">
-
-                    {/* Creator Section */}
-                    <div className="mb-20">
-                        <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-slate-900 border border-white/10 text-xs font-bold tracking-wider text-indigo-400 uppercase shadow-lg">
-                            Sobre o Criador
-                        </div>
-
-                        <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">Yuri Winchester</h3>
-                        <p className="text-slate-400 font-medium mb-8">Desenvolvedor Full Stack</p>
-
-                        <p className="text-slate-300 leading-relaxed mb-10 max-w-2xl mx-auto text-base">
-                            Transformo desafios complexos em soluções tecnológicas robustas e escaláveis. Especializado em Soluções para Saúde, Comércio e Sistemas Empresariais Personalizados. Com experiência em desenvolvimento de sistemas completos, desde a arquitetura até a implementação, entrego produtos que fazem a diferença no seu negócio.
-                        </p>
-
-                        <a
-                            href="https://yuri-winchester-portfolio-6lkk.vercel.app/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-white text-slate-950 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-xl shadow-indigo-500/10"
-                        >
-                            Conheça meu Portfólio <ArrowRight size={20} />
-                        </a>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent mb-12"></div>
+            {/* Footer Expandido */}
+            <footer className="py-20 px-6 border-t border-white/5 bg-slate-950">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
 
                     {/* Brand & Copyright */}
-                    <div className="flex flex-col items-center gap-6">
-                        <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                <PaletteIcon size={20} className="text-white" />
+                    <div className="flex flex-col gap-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <PaletteIcon size={24} className="text-white" />
                             </div>
-                            <span className="text-xl font-bold text-white tracking-tight">Estudo das Cores</span>
+                            <span className="text-xl font-bold text-slate-100">Estudo das Cores</span>
                         </div>
+                        <p className="text-slate-500 text-sm max-w-sm leading-relaxed">
+                            A plataforma definitiva para criar, visualizar e exportar paletas de cores com o poder da Inteligência Artificial.
+                        </p>
+                        <p className="text-slate-600 text-xs mt-4">© 2025 Yuri Winchester. Todos os direitos reservados.</p>
+                    </div>
 
-                        <div className="text-slate-500 text-sm flex flex-col md:flex-row gap-2 md:gap-6 items-center">
-                            <span>© 2025 Yuri Winchester</span>
-                            <span className="hidden md:block w-1 h-1 bg-slate-700 rounded-full"></span>
-                            <span>Todos os direitos reservados</span>
+                    {/* Author Section */}
+                    <div className="bg-slate-900/50 rounded-3xl p-8 border border-white/5 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-32 bg-indigo-600/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-600/20 transition-colors duration-700"></div>
+
+                        <div className="relative z-10">
+                            <h3 className="text-2xl font-bold text-white mb-2">Sobre o Criador</h3>
+                            <h4 className="text-indigo-400 font-medium mb-4">Yuri Winchester <span className="text-slate-500 text-sm font-normal">| Desenvolvedor Full Stack</span></h4>
+
+                            <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                                Especializado em Soluções para Saúde, Comércio e Sistemas Empresariais Personalizados. Transformo desafios complexos em soluções tecnológicas robustas e escaláveis. Com experiência em desenvolvimento de sistemas completos, desde a arquitetura até a implementação, entrego produtos que fazem a diferença no seu negócio.
+                            </p>
+
+                            <a
+                                href="https://yuri-winchester-portfolio-6lkk.vercel.app/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-white font-bold hover:text-indigo-400 transition-colors group/link"
+                            >
+                                Conheça meu Portfólio
+                                <span className="group-hover/link:translate-x-1 transition-transform">→</span>
+                            </a>
                         </div>
                     </div>
+
                 </div>
             </footer>
         </div>
