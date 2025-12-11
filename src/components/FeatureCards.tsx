@@ -71,7 +71,7 @@ export default function FeatureCards({ onNavigate }: FeatureCardsProps) {
                 </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl w-full">
                 {cards.map((card) => (
                     <motion.div
                         key={card.id}

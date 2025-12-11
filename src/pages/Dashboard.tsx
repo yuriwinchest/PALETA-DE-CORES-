@@ -400,20 +400,20 @@ export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = fa
             <main className="flex-1 flex overflow-hidden">
 
                 {/* Left Sidebar: Palette Builder - Hidden on HOME and Feature Pages */}
-                <aside className={`bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 relative ${viewMode === ViewMode.HOME || viewMode === ViewMode.FEATURE_GENERATE || viewMode === ViewMode.FEATURE_MEANING || viewMode === ViewMode.FEATURE_VISUALIZE
-                    ? 'hidden'
-                    : viewMode !== ViewMode.EDITOR
-                        ? 'hidden md:flex'
-                        : 'flex'
+                <aside className={`bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 relative ${viewMode === ViewMode.HOME || viewMode === ViewMode.FEATURE_GENERATE || viewMode === ViewMode.FEATURE_MEANING || viewMode === ViewMode.FEATURE_VISUALIZE || viewMode === ViewMode.SCREENSHOT_ANALYSIS
+                        ? 'hidden'
+                        : viewMode !== ViewMode.EDITOR
+                            ? 'hidden md:flex'
+                            : 'flex'
                     } ${isSidebarCollapsed ? 'w-0 md:w-16' : 'w-full md:w-80 lg:w-96'}`}>
 
                     {/* Toggle Button */}
                     <button
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                        className="absolute -right-3 top-20 z-50 w-6 h-12 bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-r-lg flex items-center justify-center text-slate-400 hover:text-white transition-all shadow-lg hidden md:flex"
+                        className="absolute -right-4 top-6 z-50 w-8 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border-2 border-white/20 rounded-r-xl flex items-center justify-center text-white transition-all shadow-xl hover:shadow-2xl hover:scale-110 hidden md:flex group"
                         title={isSidebarCollapsed ? "Expandir menu" : "Recolher menu"}
                     >
-                        {isSidebarCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
+                        {isSidebarCollapsed ? <PanelLeft size={20} className="group-hover:scale-110 transition-transform" /> : <PanelLeftClose size={20} className="group-hover:scale-110 transition-transform" />}
                     </button>
 
                     <div className={`${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'} transition-opacity duration-300 flex flex-col h-full overflow-hidden`}>
