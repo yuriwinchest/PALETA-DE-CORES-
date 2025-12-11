@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Wand2, LayoutTemplate, BrainCircuit } from 'lucide-react';
+import { Wand2, LayoutTemplate, BrainCircuit, Camera } from 'lucide-react';
 import { ViewMode } from '../types';
 
 interface FeatureCardsProps {
@@ -41,6 +41,17 @@ export default function FeatureCards({ onNavigate }: FeatureCardsProps) {
             gradient: 'from-emerald-400 via-teal-500 to-cyan-600',
             delay: 0.3,
             image: '/assets/images/foto-do-card.png'
+        },
+        {
+            id: 'screenshot',
+            title: 'Analisar Site',
+            subtitle: 'Upload de Screenshot',
+            description: 'Faça upload de um screenshot do seu site e receba análise completa das cores com IA.',
+            icon: Camera,
+            mode: ViewMode.SCREENSHOT_ANALYSIS,
+            gradient: 'from-purple-500 via-pink-500 to-orange-500',
+            delay: 0.4,
+            image: '/assets/images/card-generate.png' // Reusing existing image
         }
     ];
 

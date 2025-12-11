@@ -54,24 +54,24 @@ export const generatePaletteFromPrompt = async (prompt: string): Promise<{ name:
       config: {
         responseMimeType: "application/json",
         responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-                name: { type: Type.STRING, description: "Um nome criativo para esta paleta em Português" },
-                colors: {
-                    type: Type.ARRAY,
-                    items: {
-                        type: Type.OBJECT,
-                        properties: {
-                            hex: { type: Type.STRING, description: "Código Hex incluindo #" },
-                            name: { type: Type.STRING, description: "Um nome criativo para a cor em Português" }
-                        }
-                    }
+          type: Type.OBJECT,
+          properties: {
+            name: { type: Type.STRING, description: "Um nome criativo para esta paleta em Português" },
+            colors: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  hex: { type: Type.STRING, description: "Código Hex incluindo #" },
+                  name: { type: Type.STRING, description: "Um nome criativo para a cor em Português" }
                 }
+              }
             }
+          }
         }
       }
     });
-     const text = response.text;
+    const text = response.text;
     if (!text) throw new Error("Sem resposta da IA");
     return JSON.parse(text);
   } catch (error) {
@@ -105,6 +105,95 @@ export const getColorFromDescription = async (description: string): Promise<stri
     return result.hex;
   } catch (error) {
     console.error("Gemini Color Lookup Error:", error);
+    throw error;
+  }
+};
+
+export interface ScreenshotAnalysisResult {
+  dominantColors: { hex: string; percentage: number; name: string }[];
+  analysis: string;
+  suggestions: string[];
+  accessibility: {
+    contrastIssues: string[];
+    recommendations: string[];
+  };
+}
+
+export const analyzeWebsiteScreenshot = async (imageBase64: string): Promise<ScreenshotAnalysisResult> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const modelId = "gemini-2.0-flash-exp"; // Vision model
+
+    const response = await ai.models.generateContent({
+      model: modelId,
+      contents: [
+        {
+          parts: [
+            {
+              text: `Analise este screenshot de website e forneça uma análise completa das cores em PORTUGUÊS DO BRASIL:
+
+1. Identifique as 5-7 cores dominantes (hex, nome descritivo em português, percentual aproximado de uso)
+2. Análise da harmonia e psicologia das cores usadas
+3. 3-5 sugestões práticas de melhorias na paleta
+4. Problemas de contraste e acessibilidade (se houver)
+5. Recomendações específicas para melhorar a experiência visual
+
+Seja específico e prático nas sugestões.`
+            },
+            {
+              inlineData: {
+                mimeType: "image/jpeg",
+                data: imageBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            dominantColors: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  hex: { type: Type.STRING, description: "Código hex da cor" },
+                  name: { type: Type.STRING, description: "Nome descritivo em português" },
+                  percentage: { type: Type.NUMBER, description: "Percentual aproximado de uso (0-100)" }
+                }
+              }
+            },
+            analysis: { type: Type.STRING, description: "Análise detalhada da harmonia e psicologia das cores em português" },
+            suggestions: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING, description: "Sugestão prática de melhoria em português" }
+            },
+            accessibility: {
+              type: Type.OBJECT,
+              properties: {
+                contrastIssues: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING, description: "Problema de contraste identificado em português" }
+                },
+                recommendations: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING, description: "Recomendação de acessibilidade em português" }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("Sem resposta da IA");
+    return JSON.parse(text) as ScreenshotAnalysisResult;
+
+  } catch (error) {
+    console.error("Gemini Screenshot Analysis Error:", error);
     throw error;
   }
 };
