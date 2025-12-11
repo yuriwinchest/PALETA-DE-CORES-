@@ -392,24 +392,26 @@ export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = fa
                 <aside className={`w-full md:w-80 lg:w-96 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 ${viewMode === ViewMode.HOME || viewMode === ViewMode.FEATURE_GENERATE || viewMode === ViewMode.FEATURE_MEANING ? 'hidden' : (viewMode !== ViewMode.EDITOR ? 'hidden md:flex' : 'flex')}`}>
 
                     {/* Palette Management Section */}
-                    <div className="p-6 pb-4 border-b border-white/5 space-y-3">
-                        <div className="flex items-center gap-2 mb-1">
+                    <div className="p-5 border-b border-white/5 space-y-4 bg-slate-900/40">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Projeto</label>
                             <input
                                 type="text"
                                 value={paletteName}
                                 onChange={(e) => setPaletteName(e.target.value)}
-                                className="bg-transparent text-lg font-bold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-500 hover:border-slate-700 transition"
+                                className="bg-transparent text-xl font-bold text-white w-full outline-none border-b border-transparent focus:border-indigo-500 placeholder-slate-600 hover:border-slate-700 transition pb-1"
                                 placeholder="Nome do Projeto"
                             />
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <button
                                 onClick={handleNewPalette}
-                                className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-slate-700"
+                                className="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-semibold transition flex flex-col items-center justify-center gap-1 border border-slate-700 hover:border-slate-600 group"
                                 title="Novo Projeto"
                             >
-                                <FilePlus size={14} /> Novo
+                                <FilePlus size={16} className="text-slate-400 group-hover:text-white transition-colors" />
+                                <span>Novo</span>
                             </button>
                             <button
                                 onClick={() => {
@@ -419,49 +421,52 @@ export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = fa
                                         setShowLibrary(true);
                                     }
                                 }}
-                                className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-slate-700"
+                                className="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-semibold transition flex flex-col items-center justify-center gap-1 border border-slate-700 hover:border-slate-600 group"
                                 title="Abrir Projeto"
                             >
-                                <FolderOpen size={14} /> Abrir
+                                <FolderOpen size={16} className="text-slate-400 group-hover:text-white transition-colors" />
+                                <span>Abrir</span>
                             </button>
                             <button
                                 onClick={handleSavePalette}
-                                className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 shadow-lg shadow-indigo-500/20"
+                                className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex flex-col items-center justify-center gap-1 shadow-lg shadow-indigo-500/20 active:scale-95"
                                 title="Salvar Projeto"
                             >
-                                <Save size={14} /> Salvar
+                                <Save size={16} />
+                                <span>Salvar</span>
                             </button>
                         </div>
                     </div>
 
                     {/* AI Generator Input */}
-                    <div className="p-6 border-b border-white/5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block flex items-center gap-1">
-                            <Wand2 size={12} /> Gerador com IA
+                    <div className="p-5 border-b border-white/5 bg-gradient-to-b from-indigo-900/10 to-transparent">
+                        <label className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2 block flex items-center gap-2">
+                            <Wand2 size={14} /> Gerador Mágico
                         </label>
-                        <form onSubmit={handleGenerate} className="relative">
+                        <form onSubmit={handleGenerate} className="relative group">
                             <input
                                 type="text"
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
-                                placeholder="ex: 'Pôr do sol em Tóquio'"
-                                className="w-full bg-slate-800/50 text-sm text-white placeholder-slate-500 rounded-lg px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                                placeholder="Descreva sua ideia..."
+                                className="w-full bg-slate-800/80 text-sm text-white placeholder-slate-500 rounded-xl px-4 py-3 pr-10 border border-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition shadow-sm group-hover:bg-slate-800"
                             />
                             <button
                                 type="submit"
                                 disabled={isGenerating}
-                                className="absolute right-2 top-2 p-1 bg-indigo-600 hover:bg-indigo-500 rounded text-white transition disabled:opacity-50"
+                                className="absolute right-2 top-2 p-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white transition disabled:opacity-50 shadow-md"
+                                title="Gerar com IA"
                             >
-                                {isGenerating ? <RefreshCw size={16} className="animate-spin" /> : <Wand2 size={16} />}
+                                {isGenerating ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
                             </button>
                         </form>
                     </div>
 
                     {/* Color List */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-sm font-bold text-slate-300">Cores</h3>
-                            <span className="text-xs text-slate-500">{colors.length} cores</span>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                        <div className="flex justify-between items-center px-2">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paleta Atual</h3>
+                            <span className="text-[10px] font-mono text-slate-600 bg-slate-800/50 px-2 py-0.5 rounded-full">{colors.length} cores</span>
                         </div>
 
                         <AnimatePresence>

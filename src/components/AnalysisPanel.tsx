@@ -25,11 +25,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
         <button
           onClick={onAnalyze}
           disabled={isLoading || colors.length === 0}
-          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all ${
-            isLoading 
-              ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
+          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all ${isLoading
+              ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white shadow-lg hover:shadow-purple-500/25'
-          }`}
+            }`}
         >
           {isLoading ? (
             <>
@@ -46,9 +45,31 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
       </div>
 
       {!analysis && !isLoading && (
-        <div className="flex-1 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700 rounded-xl p-8">
-          <BrainCircuit size={48} className="mb-4 opacity-50" />
-          <p>Clique em "Gerar Análise" para revelar os segredos das suas cores.</p>
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+          <div className="relative mb-8 group cursor-pointer" onClick={onAnalyze}>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl group-hover:-translate-y-1 transition-transform duration-300">
+              <BrainCircuit size={48} className="text-purple-400" />
+            </div>
+            <div className="absolute -bottom-3 -right-3 bg-white text-slate-900 rounded-full p-2 shadow-lg scale-0 group-hover:scale-100 transition-transform duration-300">
+              <Sparkles size={16} />
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-bold text-white mb-3">Revelar Segredos da Paleta</h3>
+          <p className="text-slate-400 max-w-md mb-8 leading-relaxed">
+            Use a inteligência artificial para descobrir o impacto psicológico,
+            melhores usos e a "vibe" oculta da sua combinação de cores.
+          </p>
+
+          <button
+            onClick={onAnalyze}
+            disabled={colors.length === 0}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full font-bold shadow-lg shadow-purple-500/25 flex items-center gap-3 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+          >
+            <Sparkles size={18} />
+            Gerar Análise Completa
+          </button>
         </div>
       )}
 
@@ -70,26 +91,26 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
 
               return (
                 <div key={idx} className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col md:flex-row gap-4 items-start">
-                  <div 
-                    className="w-16 h-16 rounded-lg shadow-inner shrink-0" 
+                  <div
+                    className="w-16 h-16 rounded-lg shadow-inner shrink-0"
                     style={{ backgroundColor: item.hex }}
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                       <h4 className="font-bold text-white text-lg">{name}</h4>
-                       <span className="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded">{item.hex}</span>
+                      <h4 className="font-bold text-white text-lg">{name}</h4>
+                      <span className="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded">{item.hex}</span>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                           <Info size={12} /> Psicologia
+                          <Info size={12} /> Psicologia
                         </div>
                         <p className="text-sm text-slate-300">{item.psychology}</p>
                       </div>
                       <div>
-                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                           <Tag size={12} /> Melhor Uso
+                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                          <Tag size={12} /> Melhor Uso
                         </div>
                         <p className="text-sm text-emerald-400 bg-emerald-400/10 inline-block px-2 py-1 rounded">
                           {item.recommendedUsage}

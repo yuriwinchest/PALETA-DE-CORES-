@@ -32,7 +32,7 @@ const Visualizer: React.FC<VisualizerProps> = ({ colors }) => {
   const textOnSecondary = getContrastTextColor(secondaryAction);
 
   return (
-    <div className="w-full h-full bg-slate-950 p-4 overflow-y-auto flex items-center justify-center pb-20 relative">
+    <div className="w-full h-full bg-slate-950 p-4 md:p-8 overflow-y-auto pb-20 relative">
 
       {/* Back Button */}
       <button
