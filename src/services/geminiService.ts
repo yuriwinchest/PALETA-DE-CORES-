@@ -122,7 +122,7 @@ export interface ScreenshotAnalysisResult {
 export const analyzeWebsiteScreenshot = async (imageBase64: string): Promise<ScreenshotAnalysisResult> => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const modelId = "gemini-2.0-flash-exp"; // Vision model
+    const modelId = "gemini-1.5-flash"; // Stable vision model
 
     const response = await ai.models.generateContent({
       model: modelId,
@@ -190,10 +190,29 @@ Seja específico e prático nas sugestões.`
 
     const text = response.text;
     if (!text) throw new Error("Sem resposta da IA");
-    return JSON.parse(text) as ScreenshotAnalysisResult;
 
-  } catch (error) {
+    const result = JSON.parse(text) as ScreenshotAnalysisResult;
+
+    // Validate result
+    if (!result.dominantColors || result.dominantColors.length === 0) {
+      throw new Error("Nenhuma cor foi identificada na imagem");
+    }
+
+    return result;
+
+  } catch (error: any) {
     console.error("Gemini Screenshot Analysis Error:", error);
-    throw error;
+
+    // More specific error messages
+    if (error.message?.includes("API key")) {
+      throw new Error("Erro de autenticação com a API");
+    } else if (error.message?.includes("quota")) {
+      throw new Error("Limite de uso da API atingido");
+    } else if (error.message?.includes("model")) {
+      throw new Error("Modelo de IA não disponível");
+    } else {
+      throw new Error(error.message || "Erro ao analisar imagem");
+    }
   }
 };
+

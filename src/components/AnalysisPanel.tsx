@@ -54,9 +54,9 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
       const base64 = selectedImage.split(',')[1];
       const result = await analyzeWebsiteScreenshot(base64);
       setScreenshotAnalysis(result);
-    } catch (err) {
-      console.error(err);
-      setError('Erro ao analisar imagem. Tente novamente.');
+    } catch (err: any) {
+      console.error('Screenshot analysis error:', err);
+      setError(err.message || 'Erro ao analisar imagem. Tente novamente.');
     } finally {
       setIsAnalyzingScreenshot(false);
     }
@@ -95,8 +95,8 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
           <button
             onClick={() => setActiveTab('palette')}
             className={`flex-1 px-4 py-2 rounded-md font-semibold text-sm transition-all ${activeTab === 'palette'
-                ? 'bg-purple-600 text-white shadow-lg'
-                : 'text-slate-400 hover:text-white'
+              ? 'bg-purple-600 text-white shadow-lg'
+              : 'text-slate-400 hover:text-white'
               }`}
           >
             <span className="flex items-center justify-center gap-2">
@@ -107,8 +107,8 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis, colors, isLoadi
           <button
             onClick={() => setActiveTab('screenshot')}
             className={`flex-1 px-4 py-2 rounded-md font-semibold text-sm transition-all ${activeTab === 'screenshot'
-                ? 'bg-purple-600 text-white shadow-lg'
-                : 'text-slate-400 hover:text-white'
+              ? 'bg-purple-600 text-white shadow-lg'
+              : 'text-slate-400 hover:text-white'
               }`}
           >
             <span className="flex items-center justify-center gap-2">
