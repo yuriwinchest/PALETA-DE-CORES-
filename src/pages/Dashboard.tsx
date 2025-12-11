@@ -401,10 +401,10 @@ export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = fa
 
                 {/* Left Sidebar: Palette Builder - Hidden on HOME and Feature Pages */}
                 <aside className={`bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex flex-col shrink-0 transition-all duration-300 relative ${viewMode === ViewMode.HOME || viewMode === ViewMode.FEATURE_GENERATE || viewMode === ViewMode.FEATURE_MEANING || viewMode === ViewMode.FEATURE_VISUALIZE || viewMode === ViewMode.SCREENSHOT_ANALYSIS
-                        ? 'hidden'
-                        : viewMode !== ViewMode.EDITOR
-                            ? 'hidden md:flex'
-                            : 'flex'
+                    ? 'hidden'
+                    : viewMode !== ViewMode.EDITOR
+                        ? 'hidden md:flex'
+                        : 'flex'
                     } ${isSidebarCollapsed ? 'w-0 md:w-16' : 'w-full md:w-80 lg:w-96'}`}>
 
                     {/* Toggle Button */}
@@ -636,6 +636,7 @@ export default function Dashboard({ initialViewMode = ViewMode.HOME, isDemo = fa
                                     analysis={analysis}
                                     isLoading={isAnalyzing}
                                     onAnalyze={handleAnalyze}
+                                    onUsePalette={handleUsePaletteFromScreenshot}
                                 />
                             </motion.div>
                         )}
